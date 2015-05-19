@@ -66,7 +66,7 @@ class ChannelSession extends Channel {
    * {@inheritDoc}
    *
    * Enable the X11 forwarding.
-   * 
+   *
    * @see <a href="https://tools.ietf.org/html/rfc4254#section-6.3.1">RFC 4254 - 6.3.1</a>
    */
   public void setXForwarding(boolean enable) {

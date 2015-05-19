@@ -1,32 +1,31 @@
 /* -*-mode:java; c-basic-offset:2; indent-tabs-mode:nil -*- */
 /*
-Copyright (c) 2006-2010 ymnk, JCraft,Inc. All rights reserved.
+ Copyright (c) 2006-2010 ymnk, JCraft,Inc. All rights reserved.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are met:
 
-  1. Redistributions of source code must retain the above copyright notice,
-     this list of conditions and the following disclaimer.
+ 1. Redistributions of source code must retain the above copyright notice,
+ this list of conditions and the following disclaimer.
 
-  2. Redistributions in binary form must reproduce the above copyright 
-     notice, this list of conditions and the following disclaimer in 
-     the documentation and/or other materials provided with the distribution.
+ 2. Redistributions in binary form must reproduce the above copyright 
+ notice, this list of conditions and the following disclaimer in 
+ the documentation and/or other materials provided with the distribution.
 
-  3. The names of the authors may not be used to endorse or promote products
-     derived from this software without specific prior written permission.
+ 3. The names of the authors may not be used to endorse or promote products
+ derived from this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES,
-INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JCRAFT,
-INC. OR ANY CONTRIBUTORS TO THIS SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT,
-INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
-OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
-
+ THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES,
+ INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JCRAFT,
+ INC. OR ANY CONTRIBUTORS TO THIS SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT,
+ INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+ OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package com.jcraft.jsch.jgss;
 
 import com.jcraft.jsch.JSchException;
@@ -42,54 +41,55 @@ import org.ietf.jgss.MessageProp;
 import org.ietf.jgss.Oid;
 
 /**
- * <p>GSSContextKrb5 class.</p>
+ * <p>
+ * GSSContextKrb5 class.</p>
  *
  * @author <a href="https://github.com/ymnk"">Atsuhiko Yamanaka</a>
  * @version $Id: $Id
  */
-public class GSSContextKrb5 implements com.jcraft.jsch.GSSContext{
+public class GSSContextKrb5 implements com.jcraft.jsch.GSSContext {
 
-  private static final String pUseSubjectCredsOnly = 
-    "javax.security.auth.useSubjectCredsOnly";
-  private static String useSubjectCredsOnly = 
-    getSystemProperty(pUseSubjectCredsOnly);
+  private static final String pUseSubjectCredsOnly
+      = "javax.security.auth.useSubjectCredsOnly";
+  private static String useSubjectCredsOnly
+      = getSystemProperty(pUseSubjectCredsOnly);
 
-  private GSSContext context=null;
+  private GSSContext context = null;
+
   @Override
-  public void create(String user, String host) throws JSchException{
-    try{
+  public void create(String user, String host) throws JSchException {
+    try {
       // RFC 1964
-      Oid krb5=new Oid("1.2.840.113554.1.2.2");
+      Oid krb5 = new Oid("1.2.840.113554.1.2.2");
       // Kerberos Principal Name Form
-      Oid principalName=new Oid("1.2.840.113554.1.2.2.1");
+      Oid principalName = new Oid("1.2.840.113554.1.2.2.1");
 
-      GSSManager mgr=GSSManager.getInstance();
+      GSSManager mgr = GSSManager.getInstance();
 
-      GSSCredential crd=null;
+      GSSCredential crd = null;
       /*
-      try{
-        GSSName _user=mgr.createName(user, principalName);
-        crd=mgr.createCredential(_user,
-                                 GSSCredential.DEFAULT_LIFETIME,
-                                 krb5,
-                                 GSSCredential.INITIATE_ONLY);
-      }
-      catch(GSSException crdex){
-      }
-      */
+       try{
+       GSSName _user=mgr.createName(user, principalName);
+       crd=mgr.createCredential(_user,
+       GSSCredential.DEFAULT_LIFETIME,
+       krb5,
+       GSSCredential.INITIATE_ONLY);
+       }
+       catch(GSSException crdex){
+       }
+       */
 
-      String cname=host;
-      try{
-        cname=InetAddress.getByName(cname).getCanonicalHostName();
+      String cname = host;
+      try {
+        cname = InetAddress.getByName(cname).getCanonicalHostName();
+      } catch (UnknownHostException e) {
       }
-      catch(UnknownHostException e){
-      }
-      GSSName _host=mgr.createName("host/"+cname, principalName);
+      GSSName _host = mgr.createName("host/" + cname, principalName);
 
-      context=mgr.createContext(_host,
-                                krb5,
-                                crd,
-                                GSSContext.DEFAULT_LIFETIME);
+      context = mgr.createContext(_host,
+          krb5,
+          crd,
+          GSSContext.DEFAULT_LIFETIME);
 
       // RFC4462  3.4.  GSS-API Session
       //
@@ -102,7 +102,6 @@ public class GSSContextKrb5 implements com.jcraft.jsch.GSSContext{
       // Since the user authentication process by its nature authenticates
       // only the client, the setting of mutual_req_flag is not needed for
       // this process.  This flag SHOULD be set to "false".
-
       // TODO: OpenSSH's sshd does accepts 'false' for mutual_req_flag
       //context.requestMutualAuth(false);
       context.requestMutualAuth(true);
@@ -112,43 +111,40 @@ public class GSSContextKrb5 implements com.jcraft.jsch.GSSContext{
       context.requestAnonymity(false);
 
       return;
-    }
-    catch(GSSException ex){
+    } catch (GSSException ex) {
       throw new JSchException(ex.toString());
     }
   }
 
   /**
-   * <p>isEstablished.</p>
+   * <p>
+   * isEstablished.</p>
    *
    * @return a boolean.
    */
-  public boolean isEstablished(){
+  public boolean isEstablished() {
     return context.isEstablished();
   }
 
   @Override
   public byte[] init(byte[] token, int s, int l) throws JSchException {
-    try{
+    try {
       // Without setting "javax.security.auth.useSubjectCredsOnly" to "false",
       // Sun's JVM for Un*x will show messages to stderr in
       // processing context.initSecContext().
       // This hack is not thread safe ;-<.
       // If that property is explicitly given as "true" or "false",
       // this hack must not be invoked.
-      if(useSubjectCredsOnly==null){
+      if (useSubjectCredsOnly == null) {
         setSystemProperty(pUseSubjectCredsOnly, "false");
       }
       return context.initSecContext(token, 0, l);
-    }
-    catch(GSSException ex){
+    } catch (GSSException ex) {
       throw new JSchException(ex.toString());
-    }
-    catch(java.lang.SecurityException ex){
+    } catch (java.lang.SecurityException ex) {
       throw new JSchException(ex.toString());
-    }
-    finally{
-      if(useSubjectCredsOnly==null){
+    } finally {
+      if (useSubjectCredsOnly == null) {
         // By the default, it must be "true".
         setSystemProperty(pUseSubjectCredsOnly, "true");
       }
@@ -156,38 +152,39 @@ public class GSSContextKrb5 implements com.jcraft.jsch.GSSContext{
   }
 
   @Override
-  public byte[] getMIC(byte[] message, int s, int l){
-    try{
-      MessageProp prop =  new MessageProp(0, true);
+  public byte[] getMIC(byte[] message, int s, int l) {
+    try {
+      MessageProp prop = new MessageProp(0, true);
       return context.getMIC(message, s, l, prop);
-    }
-    catch(GSSException ex){
+    } catch (GSSException ex) {
       return null;
     }
   }
 
   /**
-   * <p>dispose.</p>
+   * <p>
+   * dispose.</p>
    */
-  public void dispose(){
-    try{
+  public void dispose() {
+    try {
       context.dispose();
-    }
-    catch(GSSException ex){
+    } catch (GSSException ex) {
     }
   }
 
-  private static String getSystemProperty(String key){
-    try{ return System.getProperty(key); }
-    catch(Exception e){ 
+  private static String getSystemProperty(String key) {
+    try {
+      return System.getProperty(key);
+    } catch (Exception e) {
       // We are not allowed to get the System properties.
-      return null; 
-    } 
+      return null;
+    }
   }
 
-  private static void setSystemProperty(String key, String value){
-    try{ System.setProperty(key, value); }
-    catch(Exception e){ 
+  private static void setSystemProperty(String key, String value) {
+    try {
+      System.setProperty(key, value);
+    } catch (Exception e) {
       // We are not allowed to set the System properties.
     }
   }
